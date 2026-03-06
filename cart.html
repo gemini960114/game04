@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>購物車 | Premium Gallery</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-bg: #0a0a0c;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --text-main: #ffffff;
+            --text-muted: #a0a0a0;
+            --accent: #6366f1;
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--primary-bg);
+            color: var(--text-main);
+            line-height: 1.6;
+        }
+
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(10, 10, 12, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 1rem 2rem;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+            letter-spacing: 2px;
+        }
+
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 4rem auto;
+            padding: 0 2rem;
+        }
+
+        h1 {
+            margin-bottom: 2rem;
+            background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .cart-item {
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .item-img {
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        .item-info {
+            flex: 1;
+        }
+
+        .item-info h3 {
+            margin-bottom: 0.25rem;
+            font-size: 1.1rem;
+        }
+
+        .item-price {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .btn-remove {
+            background: transparent;
+            border: 1px solid rgba(239, 68, 68, 0.5);
+            color: #ef4444;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-remove:hover {
+            background: #ef4444;
+            color: white;
+        }
+
+        .cart-footer {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--glass-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .total-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .btn-checkout {
+            background: var(--accent);
+            color: white;
+            padding: 1rem 2.5rem;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-checkout:hover {
+            background: #4f46e5;
+            transform: scale(1.05);
+        }
+
+        .empty-msg {
+            text-align: center;
+            color: var(--text-muted);
+            margin-top: 4rem;
+        }
+
+        .btn-back {
+            color: var(--accent);
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">PREMIUM</a>
+            <div class="nav-links">
+                <a href="index.html">返回首頁</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <h1>您的購物車</h1>
+        <div id="cartList"></div>
+        <div id="cartSummary" style="display: none;">
+            <div class="cart-footer">
+                <div>
+                    <span style="color: var(--text-muted)">總計</span>
+                    <div class="total-price" id="totalPrice">NT$ 0</div>
+                </div>
+                <button class="btn-checkout" onclick="alert('感謝您的購買！')">結帳</button>
+            </div>
+        </div>
+        <div id="emptyCart" class="empty-msg">
+            <p>購物車目前是空的</p>
+            <a href="index.html" class="btn-back">立即去逛逛 →</a>
+        </div>
+    </main>
+
+    <script>
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        const cartList = document.getElementById('cartList');
+        const emptyCart = document.getElementById('emptyCart');
+        const cartSummary = document.getElementById('cartSummary');
+        const totalPriceEl = document.getElementById('totalPrice');
+
+        function renderCart() {
+            if (cart.length === 0) {
+                cartList.innerHTML = '';
+                emptyCart.style.display = 'block';
+                cartSummary.style.display = 'none';
+                return;
+            }
+
+            emptyCart.style.display = 'none';
+            cartSummary.style.display = 'block';
+            cartList.innerHTML = cart.map((item, index) => `
+                <div class="cart-item">
+                    <img src="${item.image}" alt="${item.name}" class="item-img">
+                    <div class="item-info">
+                        <h3>${item.name}</h3>
+                        <p class="item-price">NT$ ${item.price.toLocaleString()}</p>
+                    </div>
+                    <button class="btn-remove" onclick="removeItem(${index})">移除</button>
+                </div>
+            `).join('');
+
+            const total = cart.reduce((sum, item) => sum + item.price, 0);
+            totalPriceEl.textContent = `NT$ ${total.toLocaleString()}`;
+        }
+
+        function removeItem(index) {
+            cart.splice(index, 1);
+            localStorage.setItem('cart', JSON.stringify(cart));
+            renderCart();
+        }
+
+        renderCart();
+    </script>
+</body>
+
+</html>

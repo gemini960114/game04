@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商品詳情 | Premium Gallery</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-bg: #0a0a0c;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --text-main: #ffffff;
+            --text-muted: #a0a0a0;
+            --accent: #6366f1;
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--primary-bg);
+            color: var(--text-main);
+            line-height: 1.6;
+        }
+
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(10, 10, 12, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 1rem 2rem;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+            letter-spacing: 2px;
+        }
+
+        .nav-cart {
+            position: relative;
+            color: var(--text-muted);
+            text-decoration: none;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 4rem auto;
+            padding: 0 2rem;
+            display: flex;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .product-image-container {
+            flex: 1;
+            border-radius: 24px;
+            overflow: hidden;
+            background: #151518;
+        }
+
+        .product-image {
+            width: 100%;
+            height: auto;
+            display: block;
+            transition: 0.6s;
+        }
+
+        .product-image:hover {
+            transform: scale(1.05);
+        }
+
+        .product-info {
+            flex: 1;
+        }
+
+        .product-info h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .product-info p {
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+        }
+
+        .product-price {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 2rem;
+            display: block;
+        }
+
+        .btn-add {
+            background: var(--accent);
+            color: white;
+            padding: 1rem 3rem;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-add:hover {
+            background: #4f46e5;
+            transform: translateY(-2px);
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 2rem;
+            color: var(--text-muted);
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            color: var(--accent);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                text-align: center;
+                gap: 2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">PREMIUM</a>
+            <div class="nav-links">
+                <a href="cart.html" class="nav-cart">前往購物車 →</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div class="product-image-container">
+            <img id="pImg" src="" alt="" class="product-image">
+        </div>
+        <div class="product-info">
+            <a href="index.html" class="back-link">← 返回商品列表</a>
+            <h1 id="pName"></h1>
+            <p id="pDesc">這是我們精選的高端產品，融合了現代美學設計與極致耐用性，為您的生活增添獨特魅力與實用價值。</p>
+            <span class="product-price" id="pPrice"></span>
+            <button class="btn-add" onclick="addToCart()">加入購物車</button>
+        </div>
+    </main>
+
+    <script>
+        const products = [
+            { id: 1, name: "極簡美學後背包", price: 3200, image: "images/dmytro-koplyk-QKMvmlt_NdU-unsplash.jpg" },
+            { id: 2, name: "經典手工皮鞋", price: 5800, image: "images/adrian-valverde-9SZn34Dc6yU-unsplash.jpg" },
+            { id: 3, name: "高解析耳機", price: 4500, image: "images/edmund-lou-WEbaj0JmUHU-unsplash.jpg" },
+            { id: 4, name: "專業數碼相機", price: 21000, image: "images/glen-carrie-cZYjjCD83vo-unsplash.jpg" },
+            { id: 5, name: "商務時尚手錶", price: 8900, image: "images/shiv-d-pDQfIW8kZiw-unsplash.jpg" },
+            { id: 6, name: "北歐風皮革配件", price: 1200, image: "images/00001.png" },
+            { id: 7, name: "復古設計墨鏡", price: 2600, image: "images/zhen-yao-qm7NBkrIrX8-unsplash.jpg" }
+        ];
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const productId = parseInt(urlParams.get('id'));
+        const product = products.find(p => p.id === productId);
+
+        if (product) {
+            document.getElementById('pImg').src = product.image;
+            document.getElementById('pName').textContent = product.name;
+            document.getElementById('pPrice').textContent = `NT$ ${product.price.toLocaleString()}`;
+        } else {
+            window.location.href = 'index.html';
+        }
+
+        function addToCart() {
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            cart.push(product);
+            localStorage.setItem('cart', JSON.stringify(cart));
+            alert(`已將「${product.name}」加入購物車！`);
+            window.location.href = 'cart.html';
+        }
+    </script>
+</body>
+
+</html>
